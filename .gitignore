@@ -31,4 +31,3 @@ __kungfulibs__/
 build/
 build-*/
 cmake-build-debug/
-dist/
