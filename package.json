@@ -1,5 +1,5 @@
 {
-  "name": "@kungfu-trader/action-travelsal-package",
+  "name": "@kungfu-trader/action-sync-pr-package",
   "version": "1.0.0-alpha.0",
   "main": "dist/index.js",
   "repository": "https://github.com/kungfu-trader/action-sync-pr",
