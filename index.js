@@ -11,9 +11,7 @@ const main = async function () {
     apiKey: core.getInput("apiKey"),
     base: core.getInput("base"),
   }; //定义argv，存储token等参数
-  // const traversalMessage = await lib.traversalMessageRest(argv); //调用lib.js中的核心
   await pr.getPrWithRest(argv).catch(console.error);
-  core.setOutput("traversal-messages", JSON.stringify(traversalMessage)); //通过core输出返回结果
 };
 
 if (process.env.GITHUB_ACTION) {
