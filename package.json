@@ -1,6 +1,6 @@
 {
   "name": "@kungfu-trader/action-sync-pr-package",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.1-alpha.0",
   "main": "dist/index.js",
   "repository": "https://github.com/kungfu-trader/action-sync-pr",
   "author": "Kungfu Trader",
