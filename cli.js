@@ -9,4 +9,4 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
   .help().argv;
 
 // pr.getPrWithGraphQL(argv).catch(console.error);
-pr.getPrWithRest(argv).catch(console.error);
+pr.syncAirtableWithRest(argv).catch(console.error);
