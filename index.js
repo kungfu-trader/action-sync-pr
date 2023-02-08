@@ -11,7 +11,7 @@ const main = async function () {
     apiKey: core.getInput("apiKey"),
     base: core.getInput("base"),
   }; //定义argv，存储token等参数
-  await pr.getPrWithRest(argv).catch(console.error);
+  await pr.syncAirtableWithRest(argv).catch(console.error);
 };
 
 if (process.env.GITHUB_ACTION) {
