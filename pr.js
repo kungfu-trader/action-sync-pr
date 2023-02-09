@@ -178,7 +178,9 @@ exports.syncAirtableWithRest = async function (argv) {
         page: curPage,
       });
 
-      console.log(`${repoName} has ${pulls.data.length} pull requests in page ${curPage}`);
+      console.log(
+        `${repoName} has ${pulls.data.length} pull requests in page ${curPage}`
+      );
       for (let i = 0; i < pulls.data.length; i++) {
         try {
           const item = pulls.data[i];
