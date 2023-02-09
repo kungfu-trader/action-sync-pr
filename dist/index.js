@@ -20616,7 +20616,7 @@ async function updateAirtableRecord(url, dataList, airtableApiKey) {
   let tryagain = true;
   while (tryagain) {
     try {
-      await axios.patch(
+      const r = await axios.patch(
         url,
         { records: dataList },
         {
@@ -20626,6 +20626,7 @@ async function updateAirtableRecord(url, dataList, airtableApiKey) {
           },
         }
       );
+      console.log(`updateAirtableRecord ${url} ${r.status}`);
       tryagain = false;
     } catch (e) {
       console.log(e);
@@ -20637,7 +20638,7 @@ async function createAirtableRecord(url, dataList, airtableApiKey) {
   let tryagain = true;
   while (tryagain) {
     try {
-      await axios.post(
+      const r = await axios.post(
         url,
         { records: dataList },
         {
@@ -20647,6 +20648,7 @@ async function createAirtableRecord(url, dataList, airtableApiKey) {
           },
         }
       );
+      console.log(`createAirtableRecord ${url} ${r.status}`);
       tryagain = false;
     } catch (e) {
       console.log(e);
@@ -20679,7 +20681,7 @@ exports.syncAirtableWithRest = async function (argv) {
     }
     currentPage++;
   }
-  console.log(repoList.size);
+  console.log(repoList.size, " repositories");
 
   const airtableDataMap = new Map();
   const airtablePrMap = new Map();
@@ -20710,7 +20712,7 @@ exports.syncAirtableWithRest = async function (argv) {
           dataRecCount++;
         });
         offset = resp.data.offset;
-        console.log("data offset:", offset);
+        // console.log("data offset:", offset);
         tryagain = false;
       } catch (e) {
         console.error(e);
@@ -20738,7 +20740,7 @@ exports.syncAirtableWithRest = async function (argv) {
           prRecCount++;
         });
         offset = resp.data.offset;
-        console.log("pr offset:", offset);
+        // console.log("pr offset:", offset);
         tryagain = false;
       } catch (e) {
         console.error(e);
@@ -20772,14 +20774,16 @@ exports.syncAirtableWithRest = async function (argv) {
         page: curPage,
       });
 
-      console.log(pulls.data.length);
+      console.log(
+        `${repoName} has ${pulls.data.length} pull requests in page ${curPage}`
+      );
       for (let i = 0; i < pulls.data.length; i++) {
         try {
           const item = pulls.data[i];
           const prId = airtablePrMap.get(item.html_url);
           const dataId = airtableDataMap.get(item.html_url);
-          console.log("dataId ", dataId);
-          console.log("prId ", prId);
+          // console.log("dataId ", dataId);
+          // console.log("prId ", prId);
           if (!!dataId) {
             dataList.push({
               id: dataId,
@@ -20839,30 +20843,56 @@ exports.syncAirtableWithRest = async function (argv) {
           // if (postCount % 5 === 0) {
           //   await new Promise((resolve) => setTimeout(resolve, 1000));
           // }
-          dataList = [];
+          let ret = "";
+          dataList.forEach((it) => {
+            ret += it.fields.url;
+            ret += ";";
+          });
           dataCount += 10;
-          console.log("update ", dataCount, "data table");
+          console.log("update ", dataCount, "data table", ret);
+          dataList = [];
         }
         if (dataCreateList.length == 10) {
           await createAirtableRecord(urlData, dataCreateList, argv.apiKey);
           postCount++;
-          dataCreateList = [];
+          // if (postCount % 5 === 0) {
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          // }
           dataCreateCount += 10;
-          console.log("create ", dataCreateCount, "data table");
+          let ret = "";
+          dataCreateList.forEach((it) => {
+            ret += it.fields.url;
+            ret += ";";
+          });
+          console.log("create ", dataCreateCount, "data table", ret);
+          dataCreateList = [];
         }
         if (prList.length == 10) {
           await updateAirtableRecord(urlPr, prList, argv.apiKey);
           postCount++;
-          prList = [];
+          // if (postCount % 5 === 0) {
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          // }
           prCount += 10;
-          console.log("update ", prCount, "pr table");
+          let ret = "";
+          prList.forEach((it) => (ret += it.fields.Url));
+          console.log("update ", prCount, "pr table ", ret);
+          prList = [];
         }
         if (prCreateList.length == 10) {
           await createAirtableRecord(urlPr, prCreateList, argv.apiKey);
           postCount++;
+          // if (postCount % 5 === 0) {
+          //   await new Promise((resolve) => setTimeout(resolve, 1000));
+          // }
           prCreateList = [];
           prCreateCount += 10;
-          console.log("create ", prCreateCount, "pr table");
+          let ret = "";
+          prCreateList.forEach((it) => {
+            ret += it.fields.Url;
+            ret += ";";
+          });
+          console.log("create ", prCreateCount, "pr table ", ret);
         }
       }
 
@@ -20875,30 +20905,62 @@ exports.syncAirtableWithRest = async function (argv) {
   if (dataList.length > 0) {
     await updateAirtableRecord(urlData, dataList, argv.apiKey);
     postCount++;
+    // if (postCount % 5 === 0) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    // }
     dataCount += dataList.length;
+    let ret = "";
+    dataList.forEach((it) => {
+      ret += it.fields.url;
+      ret += ";";
+    });
     dataList = [];
-    console.log("update ", dataCount, "data table");
+    console.log("update ", dataCount, "data table", ret);
   }
   if (dataCreateList.length > 0) {
     await createAirtableRecord(urlData, dataCreateList, argv.apiKey);
     postCount++;
+    // if (postCount % 5 === 0) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    // }
     dataCreateCount += dataCreateList.length;
+    let ret = "";
+    dataCreateList.forEach((it) => {
+      ret += it.fields.url;
+      ret += ";";
+    });
+    console.log("create ", dataCreateCount, "data table ", ret);
     dataCreateList = [];
-    console.log("create ", dataCreateCount, "data table");
   }
   if (prList.length > 0) {
     await updateAirtableRecord(urlPr, prList, argv.apiKey);
     postCount++;
+    // if (postCount % 5 === 0) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    // }
     prCount += prList.length;
+    let ret = "";
+    prList.forEach((it) => {
+      ret += it.fields.Url;
+      ret += ";";
+    });
+    console.log("update ", prCount, "pr table ", ret);
     prList = [];
-    console.log("update ", prCount, "pr table");
   }
   if (prCreateList.length > 0) {
     await createAirtableRecord(urlPr, prCreateList, argv.apiKey);
     postCount++;
+    // if (postCount % 5 === 0) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    // }
     prCreateCount += prCreateList.length;
+    let ret = "";
+    prCreateList.forEach((it) => {
+      ret += it.fields.Url;
+      ret += ";";
+    });
+    console.log("create ", prCreateCount, "pr table ", ret);
     prCreateList = [];
-    console.log("create ", prCreateCount, "pr table");
   }
 };
 
