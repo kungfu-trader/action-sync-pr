@@ -20665,7 +20665,7 @@ exports.syncAirtableWithRest = async function (argv) {
   const octokit = new Octokit({
     auth: `${argv.token}`,
   });
-  console.log("start get pr");
+  console.log("start get pr version 1.0.2-alpha.5");
   let currentPage = 1; //当前页，初始化为1
   const maxPerPage = 100;
   const repoList = new Map();
